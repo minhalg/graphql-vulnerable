@@ -1,4 +1,4 @@
-name: build
+name: build-SBOM
 on:
   push:
     branches:
@@ -32,7 +32,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: "primaryrep/Rep2:${{ github.sha }}"
+          tags: "minhalorg/primaryrep:${{ github.sha }}"
       
           
       - name: Manifest Generation
@@ -43,4 +43,4 @@ jobs:
               --access-token "${{ secrets.GITHUB_TOKEN }}" \
              --aqua-key "${{ secrets.AQUA_KEY }}" \
              --aqua-secret "${{ secrets.AQUA_SECRET }}" \
-             --artifact-path "primaryrep/Rep2:${{ github.sha }}"
+             --artifact-path "minhalorg/primaryrep:${{ github.sha }}"
