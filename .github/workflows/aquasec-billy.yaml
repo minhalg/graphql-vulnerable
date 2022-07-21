@@ -1,8 +1,8 @@
-name: build-SBOM
+name: build
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   checkout:
     name: Checkout
@@ -32,8 +32,20 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: "minhalorg/primaryrep:${{ github.sha }}"
-      
+          tags: "saargondocker/graphql-vuln:${{ github.sha }}"
+      - name: Run Trivy vulnerability scanner - Image mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "saargondocker/graphql-vuln:${{ github.sha }}"
+          scan-type: 'image'
+          security-checks: 'vuln,config,secret'
+          hide-progress: false
+          format: 'table'
+        env:
+          AQUA_KEY: ${{ secrets.AQUA_KEY }}
+          AQUA_SECRET: ${{ secrets.AQUA_SECRET }}
+          TRIVY_RUN_AS_PLUGIN: 'aqua'
+          GITHUB_TOKEN: ${{ github.token }}
           
       - name: Manifest Generation
         run: |
@@ -43,4 +55,4 @@ jobs:
               --access-token "${{ secrets.GITHUB_TOKEN }}" \
              --aqua-key "${{ secrets.AQUA_KEY }}" \
              --aqua-secret "${{ secrets.AQUA_SECRET }}" \
-             --artifact-path "minhalorg/primaryrep:${{ github.sha }}"
+             --artifact-path "saargondocker/graphql-vuln:${{ github.sha }}"
